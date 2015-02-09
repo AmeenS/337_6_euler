@@ -1,0 +1,71 @@
+# Plot of an orbit  around center of gravity 
+# with set graitational pull using Euler 
+# approximation 
+#
+#
+# AmeenS
+# AMS
+
+import sys
+from pylab import *
+from numpy import *
+
+# plot size in diagonal
+# keeps plot size 
+w = 1
+subplot(111, aspect = 'equal')
+ion();
+
+
+def euler( X, t, h, df, pars ):
+	return X + h*df( X, t, pars)
+
+def impEuler( X, t, h, df, pars ):
+	X1 = X + h*df( X, t, pars)
+	X2 = X1 + h*df( X1, t, pars)
+	return (X1+X2)/2.
+	
+def df( X, t, pars):
+	x,y,u,v = X
+	G, mass = pars
+	k = (G*mass)/(((x*x)+(y*y))**1.5)
+	du = -k*x;	dv = -k*y
+	rates = array([ u, v, du, dv ])
+	return rates	
+
+T = 2.*pi # time we want to get to
+n = 3000 # number of Euler steps to take   
+h = T/float(n) # Euler time-step
+
+X = array([ 1., 0., 0., 1. ], dtype = float) # initial conditions (state)
+print X
+pars = array([ 1., 1. ])	# The gravitaional force and mass
+
+x1 = 1
+y1 = 0.
+p , = plot(x1,y1,'bo', markersize = 5)
+
+plot([-2*w, 2*w],[-2*w,2*w], 'w') # sets plot dimension
+plot(0,0, 'yo', markersize = 10)
+
+for i in range(n):
+	t = i*h
+	X = impEuler( X, t, h, df, pars )    
+	x, y = X[:2]
+	plot(x,y,'r.', markersize = 2, alpha = 0.5)
+	F = df( X, t, pars)
+	xr = F[2];	yr = F[3];
+	if i%100 == 0 :
+		plot([x, x+xr], [y, y+yr], 'g->')
+		p.set_xdata(x) # reset x coordinate of the dot in the plot
+		p.set_ydata(y)
+		draw()
+	
+
+ioff(); raw_input()
+
+
+
+
+
+
